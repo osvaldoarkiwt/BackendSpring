@@ -20,7 +20,6 @@ public class CadastroClienteService {
 		return repositorio.save(cliente);
 	}
 	
-	
 	public List<Cliente> listarTodos(){
 		return repositorio.findAll();
 	}
@@ -30,6 +29,7 @@ public class CadastroClienteService {
 	}
 	
 	public void deletar(Cliente cliente) {
+		
 		repositorio.delete(cliente);
 	}
 }
