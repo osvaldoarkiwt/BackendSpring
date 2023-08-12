@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import br.com.iwt.pizzaria.domain.model.Cliente;
 
 public interface ClienteRepository extends JpaRepository<Cliente, UUID> {
-
+	public Cliente findByNome(String nome);
 }

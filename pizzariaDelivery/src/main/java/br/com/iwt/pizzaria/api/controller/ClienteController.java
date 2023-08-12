@@ -17,24 +17,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.iwt.pizzaria.api.assembler.ClienteAssembler;
+import br.com.iwt.pizzaria.api.model.ClienteModel;
 import br.com.iwt.pizzaria.domain.model.Cliente;
 import br.com.iwt.pizzaria.domain.service.CadastroClienteService;
 
-@RequestMapping("/clientes")
 @RestController
+@RequestMapping("/clientes")
 public class ClienteController {
 
 	@Autowired
 	CadastroClienteService servico;
 	
+	@Autowired
+	ClienteAssembler assembler;
+	
 	@GetMapping
-	public List<Cliente> listarClientes(){
-		return servico.listarTodos();
+	public ResponseEntity<List<ClienteModel>> listarClientes(){		
+		
+		List<ClienteModel> clientes = assembler.toCollectionModel(servico.listarTodos());
+		
+		return ResponseEntity.ok(clientes);
 	}
 	
 	@GetMapping("/{clienteId}")
-	public Cliente listarCliente(@PathVariable UUID clienteId) {
-		return servico.listarPorId(clienteId).get();
+	public ResponseEntity<Cliente> listarCliente(@PathVariable UUID clienteId) {
+		Cliente clienteResposta = servico.listarPorId(clienteId).get();
+		
+		if(clienteResposta != null)	return ResponseEntity.ok(clienteResposta);
+		
+		return ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
@@ -67,7 +79,7 @@ public class ClienteController {
 		if(resposta != null) {
 			servico.deletar(resposta);
 			
-			return ResponseEntity.ok(resposta);
+			return ResponseEntity.noContent().build();
 		}
 		
 		return ResponseEntity.notFound().build();
