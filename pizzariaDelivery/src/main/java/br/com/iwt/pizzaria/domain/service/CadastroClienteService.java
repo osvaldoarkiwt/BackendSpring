@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.iwt.pizzaria.domain.model.Cliente;
@@ -20,8 +22,11 @@ public class CadastroClienteService {
 		return repositorio.save(cliente);
 	}
 	
-	public List<Cliente> listarTodos(){
-		return repositorio.findAll();
+	public List<Cliente> listarTodos(Pageable pageable){
+		
+		Page<Cliente> clientesPage = repositorio.findAll(pageable);
+		
+		return clientesPage.getContent();
 	}
 	
 	public Optional<Cliente> listarPorId(UUID id) {
