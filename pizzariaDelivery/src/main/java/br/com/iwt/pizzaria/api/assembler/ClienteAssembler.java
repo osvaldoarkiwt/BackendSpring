@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import br.com.iwt.pizzaria.api.model.ClienteModel;
+import br.com.iwt.pizzaria.api.model.input.ClienteInput;
 import br.com.iwt.pizzaria.domain.model.Cliente;
 import lombok.AllArgsConstructor;
 
@@ -36,7 +37,7 @@ public class ClienteAssembler {
 				.collect(Collectors.toList());
 	}
 	
-	public Cliente toEntity(Cliente clienteInput) {
+	public Cliente toEntity(ClienteInput clienteInput) {
         return modelMapper.map(clienteInput, Cliente.class);
     }
 }

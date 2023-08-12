@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.iwt.pizzaria.api.assembler.ClienteAssembler;
 import br.com.iwt.pizzaria.api.model.ClienteModel;
+import br.com.iwt.pizzaria.api.model.input.ClienteInput;
 import br.com.iwt.pizzaria.domain.model.Cliente;
 import br.com.iwt.pizzaria.domain.service.CadastroClienteService;
 
@@ -51,17 +52,20 @@ public class ClienteController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.OK)
-	public Cliente adicionarCliente(@RequestBody Cliente cliente) {
-		return servico.adicionar(cliente);
+	public ClienteInput adicionarCliente(@RequestBody ClienteInput clienteInput) {
+		
+		servico.adicionar(assembler.toEntity(clienteInput));
+		
+		return clienteInput;
 	}
 	
 	@PutMapping("/{clienteId}")
-	public ResponseEntity<Cliente> atualizaCliente(@PathVariable UUID clienteId, @RequestBody Cliente cliente) {
+	public ResponseEntity<Cliente> atualizaCliente(@PathVariable UUID clienteId, @RequestBody ClienteInput clienteInput) {
 		
 		Cliente resposta = servico.listarPorId(clienteId).orElse(null);
 		
 		if(resposta != null) {
-			BeanUtils.copyProperties(cliente, resposta,"id");
+			BeanUtils.copyProperties(clienteInput, resposta,"id","compras");
 			
 			servico.adicionar(resposta);
 			
