@@ -34,64 +34,43 @@ public class ClienteController {
 	@Autowired
 	CadastroClienteService servico;
 	
-	@Autowired
-	ClienteAssembler assembler;
-	
 	@GetMapping
 	public ResponseEntity<Page<ClienteModel>> listarClientes(@PageableDefault(size=2) Pageable pageable){		
 		
-		List<ClienteModel> clientes = assembler.toCollectionModel(servico.listarTodos(pageable));
-		
-		Page<ClienteModel> clientesModelPage = new PageImpl<>(clientes, pageable, clientes.size());
-		
-		return ResponseEntity.ok(clientesModelPage);
+		return ResponseEntity.ok(servico.listarTodos(pageable));
 	}
 	
 	@GetMapping("/{clienteId}")
 	public ResponseEntity<ClienteModel> listarCliente(@PathVariable UUID clienteId) {
-		Cliente clienteResposta = servico.listarPorId(clienteId).get();
 		
-		if(clienteResposta != null)	return ResponseEntity.ok(assembler.toModel(clienteResposta));
-		
-		return ResponseEntity.notFound().build();
+		return ResponseEntity.ok(servico.listarPorIdOrThrow(clienteId));
 	}
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.OK)
-	public ClienteInput adicionarCliente(@RequestBody ClienteInput clienteInput) {
+	public ClienteModel adicionarCliente(@RequestBody ClienteInput clienteInput) {
 		
-		servico.adicionar(assembler.toEntity(clienteInput));
-		
-		return clienteInput;
+		return servico.adicionar(clienteInput);
 	}
 	
 	@PutMapping("/{clienteId}")
-	public ResponseEntity<Cliente> atualizaCliente(@PathVariable UUID clienteId, @RequestBody ClienteInput clienteInput) {
+	public ResponseEntity<ClienteModel> atualizaCliente(@PathVariable UUID clienteId, @RequestBody ClienteInput clienteInput) {
 		
-		Cliente resposta = servico.listarPorId(clienteId).orElse(null);
-		
-		if(resposta != null) {
-			BeanUtils.copyProperties(clienteInput, resposta,"id","compras");
+			servico.listarPorIdOrThrow(clienteId);
 			
-			servico.adicionar(resposta);
+			ClienteModel modelo = new ClienteModel();
 			
-			return ResponseEntity.ok(resposta);
-		}
-		
-		return ResponseEntity.notFound().build();
+			BeanUtils.copyProperties(clienteInput, modelo);
+			
+			modelo.setId(clienteId);
+			
+			return ResponseEntity.ok(modelo);
 	}
 	
 	@DeleteMapping("/{clienteId}")
-	public ResponseEntity<Cliente> deletaCliente(@PathVariable UUID clienteId){
+	@ResponseStatus(value = HttpStatus.NO_CONTENT)
+	public void deletaCliente(@PathVariable UUID clienteId){
 	
-		Cliente resposta = servico.listarPorId(clienteId).orElse(null);
-		
-		if(resposta != null) {
-			servico.deletar(resposta);
-			
-			return ResponseEntity.noContent().build();
-		}
-		
-		return ResponseEntity.notFound().build();
+		servico.deletar(clienteId);
 	}	
 }
