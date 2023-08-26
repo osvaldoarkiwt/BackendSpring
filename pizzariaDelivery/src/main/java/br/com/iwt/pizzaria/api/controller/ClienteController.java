@@ -1,12 +1,9 @@
 package br.com.iwt.pizzaria.api.controller;
 
-import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -21,10 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.iwt.pizzaria.api.assembler.ClienteAssembler;
 import br.com.iwt.pizzaria.api.model.ClienteModel;
 import br.com.iwt.pizzaria.api.model.input.ClienteInput;
-import br.com.iwt.pizzaria.domain.model.Cliente;
+import br.com.iwt.pizzaria.domain.model.filter.ClienteFilter;
 import br.com.iwt.pizzaria.domain.service.CadastroClienteService;
 
 @RestController
@@ -35,9 +31,9 @@ public class ClienteController {
 	CadastroClienteService servico;
 	
 	@GetMapping
-	public ResponseEntity<Page<ClienteModel>> listarClientes(@PageableDefault(size=2) Pageable pageable){		
+	public ResponseEntity<Page<ClienteModel>> listarClientes(ClienteFilter filtro,@PageableDefault(size=2) Pageable pageable){		
 		
-		return ResponseEntity.ok(servico.listarTodos(pageable));
+		return ResponseEntity.ok(servico.listarTodos(filtro,pageable));
 	}
 	
 	@GetMapping("/{clienteId}")
@@ -56,15 +52,7 @@ public class ClienteController {
 	@PutMapping("/{clienteId}")
 	public ResponseEntity<ClienteModel> atualizaCliente(@PathVariable UUID clienteId, @RequestBody ClienteInput clienteInput) {
 		
-			servico.listarPorIdOrThrow(clienteId);
-			
-			ClienteModel modelo = new ClienteModel();
-			
-			BeanUtils.copyProperties(clienteInput, modelo);
-			
-			modelo.setId(clienteId);
-			
-			return ResponseEntity.ok(modelo);
+			return ResponseEntity.ok(servico.atualizarCliente(clienteId, clienteInput));
 	}
 	
 	@DeleteMapping("/{clienteId}")

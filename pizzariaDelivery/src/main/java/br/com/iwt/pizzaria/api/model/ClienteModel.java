@@ -5,9 +5,11 @@ import java.util.UUID;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class ClienteModel {
 	
 	private UUID id;
